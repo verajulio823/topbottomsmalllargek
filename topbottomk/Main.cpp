@@ -33,7 +33,6 @@ int heap_k(vector<int> arr, int k);
 vector<int> vheap_k(vector<int> arr, int k);
 vector<int> heap2vector(priority_queue<int> pq);
 
-
 int main() {
 	
 	unsigned t0, t1;
@@ -43,29 +42,35 @@ int main() {
 	
 	vector<string> vapproach = { "quicksort", "quick_select","heap" };
 	vector<string> vmeth = { "bottomkelement", "topkelement","nsmallest", "nlargest"};
-
+	vector<double> vp = { 0.25 , 0.5 , 0.75 };
+	
 	for (int meth = 0; meth < vmeth.size(); meth++) {
 
 		for (int approach = 0; approach < vapproach.size(); approach++) {
 
 			for (int i = 2; i < 16; i++) {
-				t0 = clock();
-
+				
+				double time = 0.0;
 				int size_array = pow(2, i);
 				arr = create_array(size_array);
-
-				if(meth==0)
-					int rpta = bottomk_element(arr, i / 2, approach);
-				if(meth==1)
-					int rpta = topk_element(arr, i / 2, approach);
-				if(meth==2)
-					vector<int> rpta = nsmallest(arr, i / 2, approach);
-				if(meth==3)
-					vector<int> rpta = nlargest(arr, i / 2, approach);
+				for (int p = 0; p < vp.size(); p++) {
+					t0 = clock();
+					int k = int(size_array * vp[p]);
+					if (meth == 0)
+						int rpta = bottomk_element(arr, k, approach);
+					if (meth == 1)
+						int rpta = topk_element(arr, k, approach);
+					if (meth == 2)
+						vector<int> rpta = nsmallest(arr, k, approach);
+					if (meth == 3)
+						vector<int> rpta = nlargest(arr, k, approach);
+					t1 = clock();
+					time += (double(t1 - t0) / CLOCKS_PER_SEC);
+				}
 				
-				t1 = clock();
-				double time = (double(t1 - t0) / CLOCKS_PER_SEC);
-				cout << "Execution Time for 2^" << i << " = " << size_array << " datos: " << time << endl;
+				time = time / vp.size();
+				
+				cout << vmeth[meth] << "," << vapproach[approach] << "," << i << "," << size_array << "," << time << endl;
 				mycsv <<vmeth[meth] <<"," << vapproach[approach] << "," << i << "," << size_array << "," << time << endl;
 
 
@@ -73,12 +78,9 @@ int main() {
 		}
 	
 	}
-
 	
-
-	
-
 	mycsv.close();
+	
 
 	return 0;
 }
@@ -168,7 +170,7 @@ vector<int> vheap_k(vector<int> arr, int k) {
 	}
 
 	return heap2vector(heap);
-	//return heap.top();
+
 }
 
 vector<int> heap2vector(priority_queue<int> pq) {
@@ -196,6 +198,7 @@ int heap_k(vector<int> arr, int k) {
 int select_k(vector<int> arr, int begin, int end, int k, int order) {
 	if (begin == end)
 		return arr[begin];
+	
 	else {
 		int pivot = begin + rand() % (end-begin+1);
 		pivot = partition(pivot, arr, begin, end, order);
